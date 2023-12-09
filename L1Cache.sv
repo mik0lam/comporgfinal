@@ -20,6 +20,7 @@ module L1Cache (
   reg [DATA_WIDTH-1:0] cache [0: CACHE_SIZE_WORDS - 1];
   reg [TAG_WIDTH-1:0] tags [0: CACHE_SIZE_WORDS - 1];
   reg [INDEX_WIDTH-1:0] index;
+  reg [CACHE_SIZE_WORDS-1:0] lru_counter; // Counter to track LRU entries
 
   // State variables
   reg [DATA_WIDTH-1:0] read_data_internal;
@@ -29,6 +30,7 @@ module L1Cache (
       // Reset cache and state variables
       cache <= 0;
       tags <= 0;
+      lru_counter <= 0;
       read_data_internal <= 0;
     end else begin
       if (read_enable) begin
@@ -50,8 +52,15 @@ module L1Cache (
         // Write operation
         // Similar to read operation, update cache with new data
         index <= address[INDEX_WIDTH + OFFSET_WIDTH - 1: OFFSET_WIDTH];
-        cache[index] <= write_data;
-        tags[index] <= address[15:16-TAG_WIDTH];
+        if (lru_counter[index] == CACHE_SIZE_WORDS - 1) begin
+          // Evict the least recently used entry
+          cache[index] <= write_data;
+          tags[index] <= address[15:16-TAG_WIDTH];
+          lru_counter[index] <= 0;
+        end else begin
+          // Move the recently used entry to the front
+          lru_counter[index] <= lru_counter[index] + 1;
+        end
         // Write-through to memory (assuming memory write operation)
         /* Write data to memory based on address and write_data */;
       end

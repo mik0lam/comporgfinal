@@ -11,14 +11,15 @@ module alu(
     always @(*)
     begin
         case(ALU_Sel)
-            4'b00: // Clear
-                ALU_Result = 0;
-            4'b01: // Addition
+            2'b00: // And
+                ALU_Result = A && B;
+            2'b01: // Addition
                 ALU_Result = A + B;
-            4'b10: // Subtraction
+        
+            2'b10: // Subtraction
                 ALU_Result = A - B; 
-            default:
-                ALU_Result = A; // Default to accumulator
+            2'b11 // OR
+                ALU_Result = A || B; // Default to accumulator
         endcase
     end
 endmodule

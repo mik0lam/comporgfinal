@@ -9,7 +9,7 @@ module chip
 (
   input clk,
   input [add_width - 1:0] addr,
-  input [data_width - 1:0] data,
+  inout [data_width - 1:0] data,
   input cs, 
   input we,
   input oe
